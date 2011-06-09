@@ -34,18 +34,6 @@ define("API_KEY", "");
 define("CITY_ID", "");
 
 // Service request information.
-$service_code = '021';
-$lat = '37.76524078';
-$lon = '-122.4212043';
-$address_string = '123 Some Street, San Francisco, CA 94114';
-$customer_email = 'john_q_public@gmail.com';
-$device_id = 'se4H173nxaQsddl';
-$account_id = '1234567890';
-$first_name = 'John';
-$last_name = 'Public';
-$phone_number = '4151234567';
-$description = 'There is a major pothole at this location.';
-$media_url = 'http://sf.streetsblog.org/wp-content/uploads/2009/06_18/bike.route.pothole.jpg';
 
 try {
 	
@@ -53,8 +41,11 @@ try {
 	$open311 = new Open311(BASE_URL, API_KEY, CITY_ID);
 	
 	// Create a new 311 Service request.
-	$open311->createRequest($service_code, $lat, $lon, $address_string, $customer_email, $device_id, 
-				$account_id, $first_name, $last_name, $phone_number, $description, $media_url);	
+	// load the api_connection config class to make this call cleaner and more expandable
+	// let the createRequest deal with variable assignment from an array
+	if(!class_exists('api_connection_settings')) include('classes/api_request_config.php');
+	
+	$open311->createRequest(api_connection_settings::$_);	
 							
 	$createRequestXML = new SimpleXMLElement($open311->getOutput());
 	

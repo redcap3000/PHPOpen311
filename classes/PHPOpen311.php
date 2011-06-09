@@ -97,23 +97,6 @@ class APIBaseClass {
 class Open311 extends APIBaseClass {
 
 	// Private class members.
-	private $api_url;
-	private $method_name;
-	private $api_key;
-	private $city_id;
-	private $service_code;
-	private $lat;
-	private $lon;
-	private $address_string;
-	private $customer_email;
-	private $device_id;
-	private $account_id;
-	private $first_name;
-	private $last_name;
-	private $phone_number;
-	private $description;
-	private $media_url;
-	private $service_request_id;
 	
 	/**
 	 * Open311 Class Constructor.
@@ -123,6 +106,7 @@ class Open311 extends APIBaseClass {
 	 * @return null
 	 */
 	public function __construct($base_url, $api_key, $city_id) {
+	// this need to be dynamic as well specifically the 'city_id' param
 		$this->api_key = $api_key;
 		$this->city_id = $city_id;
 		parent::__construct($base_url);
@@ -158,25 +142,38 @@ class Open311 extends APIBaseClass {
 	 * @param string $media_url
 	 * @return string
 	 */
-	public function createRequest($service_code, $lat=NULL, $lon=NULL, $address_string=NULL, $customer_email=NULL, $device_id=NULL, 
-				      			  $account_id=NULL, $first_name=NULL, $last_name=NULL, $phone_number=NULL, $description=NULL, $media_url=NULL) {
+	 
+	 
+//	public function createRequest($service_code, $lat=NULL, $lon=NULL, $address_string=NULL, $customer_email=NULL, $device_id=NULL, 
+//				      			  $account_id=NULL, $first_name=NULL, $last_name=NULL, $phone_number=NULL, $description=NULL, $media_url=NULL) 
+	 
+	 
+	 private static $special_settings = array(
+	 	'address_string' => 'url',
+	 	'description' => 'url'
+	 );
+	 // keeps track of any specific processing if needed, the key refers to the setting, while the value refers to the class of setting
+	 // to be handled in a specific way when encountered
+	public function createRequest($connection_settings) {
 		
-		$this->service_code = $service_code;
-		$this->lat = $lat;
-		$this->lon = $lon;
-		$this->address_string = urlencode($address_string);
-		$this->customer_email = $customer_email;
-		$this->device_id = $device_id;
-		$this->account_id = $account_id;
-		$this->first_name = $first_name;
-		$this->last_name = $last_name;
-		$this->phone_number = $phone_number;
-		$this->description = urlencode($description);
-		$this->media_url = $media_url;
 		
-		if((empty($lat) && empty($lon)) && strlen($address_string) == 0) {
+		// this can be replaced with the code ...
+		
+		
+		if((empty($connection_settings['lat']) && empty($connection_settings['lat']) && strlen(empty($connection_settings['lat']))) == 0) {
 			throw new create_requestException('Must submit lat/lon or address string with create service request.');
 		}
+		
+		foreach($connection_settings as $name=>$setting){
+			// ideally use another array to define the special settings themselves
+			if(array_key_exists($name,self::$special_settings) && self::$special_settings[$name] == 'url')
+			// process special setting, for now only 'url'
+				$this->$name = urlencode($setting);
+			else
+				$this->$name = $setting;
+		
+		}
+		
 		
 		// Set URL for API method.
 		$this->method_name = 'create_request';
@@ -205,7 +202,8 @@ class Open311 extends APIBaseClass {
 	 * Helper method to make the cURL request to the Open 311 API.
 	 */
 	private function makeAPIRequest() {
-		
+		// this function will need to be abstracted for use with other apis. Will probably be able to use the api_request_config file to 
+		// populate these requests, and create an easy to understand language to use to define the api requests
 		$request_url = $this->base_url.$this->method_name.'?api_key='.$this->api_key.'&city_id='.$this->city_id;
 		
 		switch($this->method_name) {
