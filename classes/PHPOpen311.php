@@ -204,8 +204,7 @@ class Open311 extends APIBaseClass {
 	private function makeAPIRequest() {
 		// this function will need to be abstracted for use with other apis. Will probably be able to use the api_request_config file to 
 		// populate these requests, and create an easy to understand language to use to define the api requests
-		$request_url = $this->base_url.$this->method_name.'?api_key='.$this->api_key.'&city_id='.$this->city_id;
-		
+		// define this base request_url
 		switch($this->method_name) {
 			
 			case 'service_list':				
@@ -214,15 +213,20 @@ class Open311 extends APIBaseClass {
 			case 'create_request':
 			// use connection settings to create the request url
 				foreach(connection_settings::$_ as $name=>$value){
-					$request_url []= "$name=$this->$value";	
+					// this city->id is a hard coded value needs to not be
+					// band aid for bigger issue avoid reprocessing it
+						if($name!='city_id')
+							$request_url_array []= "$name=$this->$value";	
 				}
-				$request_url = '&'. implode('&',$request_url);
+				$request_url = implode('&',$request_url_array);
 				break;
 				
 			case 'status_update':
-				$request_url .= "&service_request_id=$this->service_request_id";
+				$request_url .= "service_request_id=$this->service_request_id";
 				break;
 		}
+		// this line is what every request should contain, will need to code exceptions for the 'create_request' and connection_settings config class
+		$request_url = $this->base_url.$this->method_name.'?api_key='.$this->api_key . '&city_id='.$this->city_id.'&' .$request_url;
 		
 		// Set options for all cURL requests
 		curl_setopt($this->ch, CURLOPT_URL, $request_url);
