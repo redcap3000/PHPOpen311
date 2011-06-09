@@ -212,11 +212,11 @@ class Open311 extends APIBaseClass {
 				break;
 
 			case 'create_request':
-				$request_url .= "&service_code=$this->service_code&lat=$this->lat&lon=$this->lon";
-				$request_url .= "&address_string=$this->address_string&customer_email=$this->customer_email";
-				$request_url .= "&device_id=$this->device_id&account_id=$this->account_id&first_name=$this->first_name";
-				$request_url .= "&last_name=$this->last_name&phone_number=$this->phone_number&description=$this->description";
-				$request_url .= "&media_url=$this->media_url";
+			// use connection settings to create the request url
+				foreach(connection_settings::$_ as $name=>$value){
+					$request_url []= "$name=$this->$value";	
+				}
+				$request_url = '&'. implode('&',$request_url);
 				break;
 				
 			case 'status_update':
