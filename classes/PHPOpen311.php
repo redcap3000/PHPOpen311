@@ -212,7 +212,10 @@ class Open311 extends APIBaseClass {
 
 			case 'create_request':
 			// use connection settings to create the request url
-				foreach(connection_settings::$_ as $name=>$value){
+			// use array_key intersects ?
+			// filter uneeded existing this elements by checking it against the keys in connection_settings
+			// not positive if getob
+				foreach(array_insersect_key(get_object_vars($this),connection_settings::$_) as $name=>$value){
 					// this city->id is a hard coded value needs to not be
 					// band aid for bigger issue avoid reprocessing it
 						if($name!='city_id')
